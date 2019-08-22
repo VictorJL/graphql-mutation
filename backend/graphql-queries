@@ -116,3 +116,4 @@ query moviesQuery{
 }
 
 #There is no way to tell GraphiQL which authorization headers to use.
+#See more here: https://github.com/graphile/postgraphile/issues/83
