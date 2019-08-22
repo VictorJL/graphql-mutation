@@ -85,3 +85,34 @@
 #    }
 #  }
 #}
+
+mutation loginMutation{
+  login(username: "kai", password:"seaside"){
+    token,
+    user{
+      id,
+      username
+    }
+  }
+}
+
+query moviesQuery{
+  movies {
+    scoutbase_rating
+    title
+    year
+    rating
+    actors {
+      name
+      birthday
+      country
+      directors {
+        name
+        birthday
+        country
+      }
+    }
+  }
+}
+
+#There is no way to tell GraphiQL which authorization headers to use.

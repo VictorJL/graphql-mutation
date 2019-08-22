@@ -173,6 +173,28 @@ const movieType = new GraphQLObjectType({
       description: 'The movie rating.',
     },
 
+    scoutbase_rating: {
+      type: GraphQLString,
+      resolve: function(source, params, context, info){
+
+        const userId = getUserId(context)
+
+        if(userId !== null){
+          return db.select('*').from('users').where('id', userId)
+                   .then(items => {
+                        if(items.length){
+                            return (Math.floor(Math.random() * 9) + 5).toString();
+                        } else {
+                            return "";
+                        }
+                    })
+                    .catch(err => console.log({dbError: 'db error'}))
+        }
+
+      }
+    },
+
+
     actors: {
       type: new GraphQLList(actorType),
       resolve: function(source, params){
@@ -268,6 +290,7 @@ const mutation = new GraphQLObjectType({
                         const valid = await bcrypt.compare(args.password, user.password)
                         
                         if (!valid) {
+                          context.request.headers.authorization = null;
                           return {};
                         }
 
