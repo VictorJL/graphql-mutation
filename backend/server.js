@@ -11,6 +11,7 @@ const helmet = require('helmet'); // creates headers that protect from attacks (
 const bodyParser = require('body-parser'); // turns response into usable format
 const cors = require('cors');  // allows/disallows cross-site communication
 const morgan = require('morgan'); // logs requests
+const cookieParser = require("cookie-parser");
 
 // App
 const app = express();
@@ -20,6 +21,7 @@ const schema = require('./schemas/schema');
 
 app.use(helmet());
 app.use(cors());
+app.use(cookieParser());
 app.options('*', cors());
 app.use(bodyParser.json());
 app.use(morgan('combined')); // use 'tiny' or 'combined'
@@ -28,7 +30,8 @@ app.use('/graphql', graphqlHTTP((request, response, graphQLParams) => ({
   schema: schema,
   graphiql: true,
   context: { 
-    request: request
+    request: request,
+    response: response
   }
 })));
 

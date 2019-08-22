@@ -183,7 +183,7 @@ const movieType = new GraphQLObjectType({
           return db.select('*').from('users').where('id', userId)
                    .then(items => {
                         if(items.length){
-                            return (Math.floor(Math.random() * 9) + 5).toString();
+                            return (Math.floor(Math.random() * (9 - 5 + 1)) + 5).toString();
                         } else {
                             return "";
                         }
@@ -259,7 +259,9 @@ const mutation = new GraphQLObjectType({
                       const token = jwt.sign({ userId: users[0].id }, APP_SECRET)
                       const user = users[0];
 
-                      context.request.headers.authorization = token
+                      //context.request.headers.authorization = token
+
+                      context.response.cookie('token', token, { maxAge: 1000 * 60 * 1, httpOnly: true });
 
                       return {
                         token,
@@ -296,8 +298,10 @@ const mutation = new GraphQLObjectType({
 
                         const token = jwt.sign({ userId: user.id }, APP_SECRET)
 
-                        context.request.headers.authorization = token
-                        
+                        //context.request.headers.authorization = token
+
+                        context.response.cookie('token', token, { maxAge: 1000 * 60 * 1, httpOnly: true });
+
                         return {
                           token,
                           user
