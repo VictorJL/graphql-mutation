@@ -1,0 +1,66 @@
+
+#mutation {
+#      createMovie(title: "Matrix", year: "2000", rating: "8.0") {
+#        id,
+#        title,
+#        year,
+#        rating
+#      }
+#}
+
+#mutation {
+#      createActor(name: "Keanu", 
+#        					birthday: "09/02/1964", 
+#        					country:"Canada",
+#      						movie_id: 1) {
+#        id,
+#        name,
+#        birthday,
+#        country,
+#        movie_id
+#      }
+#}
+
+#mutation {
+#      createDirector(name: "Lana", 
+#        					birthday: "06/21/1965", 
+#        					country:"US",
+#      						actor_id: 1) {
+#        id,
+#        name,
+#        birthday,
+#        country,
+#        actor_id
+#      }
+#}
+
+#mutation {
+#      createDirector(name: "Lilly", 
+#        					birthday: "12/29/1967", 
+#        					country:"US",
+#      						actor_id: 1) {
+#        id,
+#        name,
+#        birthday,
+#        country,
+#        actor_id
+#      }
+#}
+
+#{
+#  movies {
+#    title
+#    year
+#    rating
+#    actors {
+#      name
+#      birthday
+#      country
+#      directors {
+#        name
+#        birthday
+#        country
+#      }
+#    }
+#  }
+#}
