@@ -64,3 +64,24 @@
 #    }
 #  }
 #}
+
+
+#mutation {
+#  createUser(username:"kai", password:"seaside"){
+#    token,
+#    user{
+#      id,
+#      username
+#    }
+#  }
+#}
+
+#mutation {
+#  login(username:"kai", password:"seaside"){
+#    token,
+#    user{
+#      id,
+#      username
+#    }
+#  }
+#}

@@ -1,3 +1,7 @@
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { APP_SECRET, getUserId } = require('../utils')
+
 var isProduction = process.env.DATABASE_URL ? true : false;
 
 var db = {};
@@ -44,6 +48,23 @@ const userType = new GraphQLObjectType({
     password: {
       type: GraphQLString,
       description: 'The user password.'
+    }
+  }
+});
+
+const sessionType = new GraphQLObjectType({
+  name: 'Session',
+  type: 'Query',
+  description: 'A session',
+  fields: {
+
+    token: {
+      type: GraphQLString,
+      description: 'The session token.'
+    },
+    user: {
+      type: userType,
+      description: 'The session user.'
     }
   }
 });
@@ -198,30 +219,72 @@ const mutation = new GraphQLObjectType({
     type: 'Mutation',
     fields: {
       createUser: {
-            type: userType,
+            type: sessionType,
             args: {
                 username: { type: GraphQLString },
                 password: { type: GraphQLString }
             },
-            resolve: function(parentValue, args){
-                const { username, password } = args;
+            resolve: async function(parentValue, args, context, info){
+                const { username } = args;
 
-                const token = new Date();
+                const password = await bcrypt.hash(args.password, 10)
+
 
                 return db('users').insert({username, password})
                   .returning('*')
-                  .then(items => {
+                  .then(users => {
+
+                      const token = jwt.sign({ userId: users[0].id }, APP_SECRET)
+                      const user = users[0];
+
+                      context.request.headers.authorization = token
+
                       return {
-                        "token": token, 
-                        "user": {
-                          "id": items[0].id,
-                          "name": items[0].username
-                        }
+                        token,
+                        user
                       };
                     })
                   .catch(function(err){
                     console.log(err);
                   });
+            }
+          },
+          login: {
+            type: sessionType,
+            args: {
+                username: { type: GraphQLString },
+                password: { type: GraphQLString }
+            },
+            resolve: async function(parentValue, args, context, info){
+                const { username } = args;
+
+
+                return db.select('*').from('users').where('username', username)
+                .then(async users =>  {
+                     if(users.length){
+
+                        const user = users[0];
+
+                        const valid = await bcrypt.compare(args.password, user.password)
+                        
+                        if (!valid) {
+                          return {};
+                        }
+
+                        const token = jwt.sign({ userId: user.id }, APP_SECRET)
+
+                        context.request.headers.authorization = token
+                        
+                        return {
+                          token,
+                          user
+                        };
+
+                     } else {
+                         return { dataExists: 'false'};
+                     }
+                 })
+                 .catch(err => console.log({dbError: 'db error'}))
             }
           },
       createMovie: {

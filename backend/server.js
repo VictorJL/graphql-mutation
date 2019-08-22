@@ -24,11 +24,13 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(morgan('combined')); // use 'tiny' or 'combined'
 
-app.use('/graphql', graphqlHTTP({
+app.use('/graphql', graphqlHTTP((request, response, graphQLParams) => ({
   schema: schema,
   graphiql: true,
-  context: request => { return {...request};}
-}));
+  context: { 
+    request: request
+  }
+})));
 
 // App Server Connection
 app.listen(process.env.PORT || 5000, () => {
